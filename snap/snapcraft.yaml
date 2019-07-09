@@ -1,0 +1,43 @@
+name: edgex-grove-pi-demo
+base: core18
+version: '1.0.0'
+summary: Grove Sensor Setup for EdgeX Raspberry Pi 
+description: |
+  Service to configure and setup Grove Sensor services with device-grove-c on a
+  Grove Sensor Development Kit.
+
+grade: stable
+confinement: strict
+
+architectures:
+  - build-on: amd64
+  - build-on: arm64
+
+apps:
+  register-mqtt:
+    command: bin/register-mqtt.sh
+    command-chain:
+      - bin/lua-env-runner.sh
+    daemon: simple
+    adapter: full
+    plugs:
+      - network
+
+parts:
+  demo-grove-pi:
+    plugin: dump
+    source: .
+    stage-packages:
+      - lua5.1
+      - lua-dkjson
+      - lua-socket
+    prime:
+      - -docker-compose-demo-grove.yml
+    override-build: |
+      snapcraftctl build
+      # make a lua symbolic link to use lua5.2
+      cd $SNAPCRAFT_PART_INSTALL/usr/bin
+      ln -s lua5.1 lua
+    organize:
+      snap/local/bin/register-mqtt.sh: bin/register-mqtt.sh
+      snap/local/bin/lua-env-runner.sh: bin/lua-env-runner.sh

@@ -1,0 +1,6 @@
+*.snap
+prime/
+stage/
+parts/
+*.assert
+squashfs-root/
